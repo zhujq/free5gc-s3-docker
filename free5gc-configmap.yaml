@@ -142,7 +142,7 @@ data:
       pfcp:
         addr: 192.168.2.3
       upf:
-        - addr: 192.168.2.10
+        - addr: 10.146.0.42
       ue_subnet: 60.60.0.0/16
       nrfUri: https://192.168.2.5:29510
   ausfcfg.conf: |
