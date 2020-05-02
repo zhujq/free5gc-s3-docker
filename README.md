@@ -31,7 +31,9 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io
 
 3、安装k8s
   curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+  
   cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+  
   deb https://apt.kubernetes.io/ kubernetes-xenial main
    EOF
    sudo apt-get update
@@ -46,4 +48,24 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io
     kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
   
   4、安装ovs-cni容器多端口插件
+    kubectl apply -f ovs-cni.yaml
+    kubectl apply -f ovs-net-crd.yaml
+    
+   5、安装 etcd-operator 和 Node Exporter
+      cd etcd-cluster/rbac/
+      ./create_role.sh
+       cd ..
+     kubectl apply -f ./
+      
+       cd ..
+     kubectl apply -f prom-node-exporter.yaml
+   
+   6、部署mysql、mano、nfvo
+     kubectl apply -f service-account-agent.yaml
+     kubectl apply -f mysql-agent.yaml
+     kubectl apply -f kube5gnfvo.yaml
+     kubectl apply -f 5gmano-deploy
+    
+    7、部署除AFM/UPF外的5GC
+    
   
