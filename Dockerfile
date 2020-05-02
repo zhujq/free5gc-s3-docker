@@ -6,7 +6,7 @@ RUN apt update -y
 RUN apt -y install wget git
 
 WORKDIR $GOPATH/src
-RUN git clone https://github.com/free5gc/free5gc-stage-3.git free5gc
+RUN git clone https://github.com/zhujq/free5gc-stage-3.git free5gc
 
 WORKDIR $GOPATH/src/free5gc
 RUN chmod +x ./install_env.sh
