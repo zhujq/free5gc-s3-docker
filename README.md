@@ -5,6 +5,7 @@ create free5gc-stange3-dockerfile and build docker image to deploy
 主要步骤：
 
 1、准备ubuntu 18/04,更换内核到5.0.0-23-generic
+
   apt-get update
   apt-get install linux-image-5.0.0-23-generic
   apt-get install linux-headers-5.0.0-23-generic
@@ -14,6 +15,7 @@ create free5gc-stange3-dockerfile and build docker image to deploy
   reboot
 
 2、安装docker
+
 sudo apt-get -y install \
     apt-transport-https \
     ca-certificates \
@@ -30,6 +32,7 @@ sudo apt-get update
 sudo apt-get -y install docker-ce docker-ce-cli containerd.io
 
 3、安装k8s
+
   curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
   
   cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
@@ -47,25 +50,38 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io
 
     kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
   
-  4、安装ovs-cni容器多端口插件
+  4、安装openvswitch和ovs-cni容器多端口插件
+  
+    apt install openvswitch-switch -y
+    ovs-vsctl add-br br1
     kubectl apply -f ovs-cni.yaml
     kubectl apply -f ovs-net-crd.yaml
     
+    //br1的IP地址设置为192.168.3.254/23，作为k8s 5gc网元的网口的网关
+     vi /etc/netplan/50-cloud-init.yaml 
+     sudo  netplan apply 
+    
    5、安装 etcd-operator 和 Node Exporter
+   
       cd etcd-cluster/rbac/
       ./create_role.sh
-       cd ..
-     kubectl apply -f ./
+      cd ..
+      kubectl apply -f ./
       
-       cd ..
-     kubectl apply -f prom-node-exporter.yaml
+      cd ..
+      kubectl apply -f prom-node-exporter.yaml
    
    6、部署mysql、mano、nfvo
+   
      kubectl apply -f service-account-agent.yaml
      kubectl apply -f mysql-agent.yaml
      kubectl apply -f kube5gnfvo.yaml
-     kubectl apply -f 5gmano-deploy
+     kubectl apply -f 5gmano-deploy.ymal
     
     7、部署除AFM/UPF外的5GC
     
-  
+     kubectl apply -f unix-daemonset.yaml
+     kubectl apply -f free5gc-mongodb.yaml
+     kubectl apply -f free5gc-configmap.yaml
+     kubectl apply -f free5gc-nrf.yaml
+      
