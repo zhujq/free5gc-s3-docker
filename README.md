@@ -107,4 +107,16 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io
      kubectl apply -f free5gc-configmap.yaml
      
      kubectl apply -f free5gc-nrf.yaml
+     
+     kubectl apply -f free5gc-ausf.yaml
+     
+     kubectl apply -f free5gc-smf.yaml
+     
+     kubectl apply -f free5gc-nssf.yaml
+     
+     kubectl apply -f free5gc-pcf.yaml
+     
+     kubectl apply -f free5gc-udm.yaml
+     
+     kubectl apply -f free5gc-udr.yaml
       
