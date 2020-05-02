@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube5gnfvo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kube5gnfvo
+  template:
+    metadata:
+      labels:
+        app: kube5gnfvo
+    spec:
+      serviceAccountName: kube5gnfvo
+      containers:
+      - image: free5gmano/kube5gnfvo
+        name: kube5gnfvo
+        env:
+        - name: DATABASE_PASSWORD
+          value: "password"
+        - name: DATABASE_HOST
+          value: "kube5gnfvo-mysql"
+        - name: DATABASE_PORT
+          value: "30036"
+        command: ["/bin/sh","-c"]
+        args: ['python3 manage.py migrate && python3 manage.py runserver 0:8000']
+        ports:
+        - containerPort: 8000
+          name: kube5gnfvo
+        volumeMounts:
+        - name: kube5gnfvo-vnf-package
+          mountPath: /root/NSD
+          subPath: NSD
+        - name: kube5gnfvo-vnf-package
+          mountPath: /root/VnfPackage
+          subPath: VnfPackage
+      volumes:
+      - name: kube5gnfvo-vnf-package
+        persistentVolumeClaim:
+          claimName: kube5gnfvo-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube5gnfvo
+spec:
+  type: NodePort
+  ports:
+  - port: 8000
+    nodePort: 30888
+  selector:
+    app: kube5gnfvo
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kube5gnfvo-pvc
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kube5gnfvo-pv
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    type: DirectoryOrCreate
+    path: /mnt/kube5gnfvo
