@@ -1,8 +1,9 @@
 # free5gc-s3-docker
 create free5gc-stange3-dockerfile and build docker image to deploy
-参考free5gc,以stage3进行部署
+参考free5gc,以stage3进行部署,以k8s作为vim，mano、nfvo、除amf/upf外用k8s部署，amf、upf直接以可执行程序部署在ubuntu18.04上，规避iptables对sctp的支持不足，以及提高UPF处理能力。
 
 主要步骤：
+
 1、准备ubuntu 18/04,更换内核到5.0.0-23-generic
   apt-get update
   apt-get install linux-image-5.0.0-23-generic
@@ -36,4 +37,13 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io
    sudo apt-get update
    apt-get install -y kubelet kubeadm kubectl
 
-   kubeadm init --apiserver-advertise-address=192.168.0.24  --pod-network-cidr=10.244.0.0/16
+   kubeadm init --apiserver-advertise-address=xx.xx.xx.xx  --pod-network-cidr=10.244.0.0/16
+   
+   mkdir -p $HOME/.kube
+   sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+   sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  
+  4、安装ovs-cni容器多端口插件
+  
