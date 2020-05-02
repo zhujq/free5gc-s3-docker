@@ -1,0 +1,85 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kube5gnfvo-mysql
+spec:
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: kube5gnfvo-mysql
+  template:
+    metadata:
+      labels:
+        app: kube5gnfvo-mysql
+    spec:
+      containers:
+      - image: mysql:5.6
+        name: kube5gnfvo-mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: password
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: kube5gnfvo-mysql
+          mountPath: /var/lib/mysql
+        volumeMounts:
+        - name: mysql-initdb
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: kube5gnfvo-mysql
+        persistentVolumeClaim:
+          claimName: kube5gnfvo-mysql
+      volumes:
+      - name: mysql-initdb
+        configMap:
+          name: mysql-initdb-config
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: kube5gnfvo-mysql
+  labels:
+    type: local
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/mnt/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kube5gnfvo-mysql
+  namespace: default
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kube5gnfvo-mysql
+spec:
+  type: NodePort
+  ports:
+  - port: 3306
+    nodePort: 30036
+  selector:
+    app: kube5gnfvo-mysql
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-initdb-config
+data:
+  initdb.sql: |
+    CREATE DATABASE kube5gmano;
+    CREATE DATABASE free5gmano;
